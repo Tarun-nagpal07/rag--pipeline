@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from langchain_community.document_loaders import PyPDFLoader
-
+from utils.errors import DocumentLoadError
 
 def get_pdf_paths(pdf_directory: str):
     pdf_dir = Path(pdf_directory)
@@ -11,5 +11,8 @@ def get_pdf_paths(pdf_directory: str):
 
 
 def load_pdf(pdf_path: str):
-    loader = PyPDFLoader(str(pdf_path))
-    return loader.load()
+    try: 
+        loader = PyPDFLoader(str(pdf_path))
+        return loader.load()
+    except Exception as e:
+        raise DocumentLoadError(str(e))
