@@ -8,7 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 parser = StrOutputParser()
 
 def format_docs(retrieve_docs):
-    context_text = "/n/n".join(doc.page_content for doc in retrieve_docs )
+    context_text = "\n\n".join(doc.page_content for doc in retrieve_docs)
     return context_text
 
 

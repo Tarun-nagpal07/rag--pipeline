@@ -1,7 +1,8 @@
 from qdrant_client import QdrantClient
 from langchain_qdrant import QdrantVectorStore
 from src.embeddings.hf_embedding import embeddings
-from src.config import QDRANT_HOST
+from src.utils.config import QDRANT_HOST
+
 client = QdrantClient(
     url=QDRANT_HOST
 )

@@ -1,5 +1,6 @@
 from langchain.chat_models import init_chat_model
-from src.config import API_KEY, BASE_URL, LLM_MODEL
+from src.utils.config import API_KEY, BASE_URL, LLM_MODEL
+
 
 model = init_chat_model(
     model=LLM_MODEL,
