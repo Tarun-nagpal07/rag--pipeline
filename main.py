@@ -1,15 +1,22 @@
-
 import logging
 from src.chains.rag_chain import chain
 from src.utils.errors import ModelError, RetrievalError
-
-
+from src.observability.langfuse import get_langfuse_handler
+from src.utils.config import LANGFUSE_BASE_URL,LANGFUSE_PUBLIC_KEY,LANGFUSE_SECRET_KEY
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def main():
+handler = get_langfuse_handler()
 
+config = {
+    "callbacks": [handler],
+    "metadata": {
+        "user_id": "user_123",
+        "session_id": "session_abc"
+    }
+}
+def main():
     print("..........Hello, Welcome to Health Chatbot...........")
 
     while True:
@@ -22,7 +29,11 @@ def main():
                 continue
 
             print("System : ", end=' ')
-            for s in chain.stream(question):
+
+            for s in chain.stream(
+                question,
+                config=config
+                ):
                 print(s, end=' ')
             print('\n')
 

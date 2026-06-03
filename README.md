@@ -35,6 +35,7 @@ API_KEY=your_api_key
 BASE_URL=https://api.example.com
 HF_TOKEN=your_hf_token
 QDRANT_HOST=http://localhost:6333
+OPENAI_API_KEY=your_openai_api_key
 ```
 
 Adjust values as needed for your environment.
