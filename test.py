@@ -1,49 +1,24 @@
-# from ragas import evaluate
-# from ragas.metrics import (
-#     faithfulness,
-#     answer_relevancy,
-#     context_precision,
-#     context_recall
-# )
 
-# from datasets import Dataset
-# from src.model.llm import model
-# dataset = Dataset.from_dict(
-#     {
-#         "question": [
-#             "What is protein?"
-#         ],
-#         "answer": [
-#             "Protein is essential for muscle growth."
-#         ],
-#         "contexts": [
-#             ["Protein helps repair tissues and build muscle."]
-#         ],
-#         "ground_truth": [
-#             "Protein is essential for muscle repair and growth."
-#         ]
-#     }
-# )
-
-# result = evaluate(
-#     dataset=dataset,
-#     metrics=[
-#         faithfulness,
-#         answer_relevancy,
-#         context_precision,
-#         context_recall,
-#     ],
-#     llm=model
-# )
 
 from openai import AsyncOpenAI
+from dotenv import load_dotenv
 from ragas.llms import llm_factory
 from ragas.metrics.collections import ContextPrecision
 import os
+
+load_dotenv()
+
+api_key = os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY")
+base_url = os.getenv("BASE_URL")
+
+if not api_key:
+    raise RuntimeError("Missing API key. Set API_KEY or OPENAI_API_KEY in .env.")
+
 # Setup LLM
 client = AsyncOpenAI(
-    api_key=os.getenv("API_KEY"),
-    base_url=os.getenv("BASE_URL")
+    api_key=api_key,
+    base_url=base_url,
+    timeout=30.0,
 )
 llm = llm_factory("gpt-4o-mini", client=client)
 

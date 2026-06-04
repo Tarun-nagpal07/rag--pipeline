@@ -1,0 +1,13 @@
+from langchain_core.prompts import PromptTemplate
+
+
+rewrite_template = PromptTemplate(
+    template="""
+    "Look at the input and try to reason about the underlying semantic intent / meaning.\n"
+    "Here is the initial question:"
+    "\n ------- \n"
+    "{question}"
+    "\n ------- \n"
+    "Formulate an improved question:"
+    """
+)

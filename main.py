@@ -1,11 +1,13 @@
 import logging
-from src.chains.rag_chain import chain
+# from src.rag_service.graph import chain
 from src.utils.errors import ModelError, RetrievalError
-from src.observability.langfuse import get_langfuse_handler
-from src.utils.config import LANGFUSE_BASE_URL,LANGFUSE_PUBLIC_KEY,LANGFUSE_SECRET_KEY
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from src.rag_service.langfuse import get_langfuse_handler
+from langfuse.decorators import observe
+from src.utils.logger import get_logger
+from src.graph.build import graph
 
+logger = get_logger(__name__)
+import os
 
 handler = get_langfuse_handler()
 
@@ -16,6 +18,9 @@ config = {
         "session_id": "session_abc"
     }
 }
+
+
+@observe()
 def main():
     print("..........Hello, Welcome to Health Chatbot...........")
 
@@ -30,15 +35,15 @@ def main():
 
             print("System : ", end=' ')
 
-            for s in chain.stream(
-                question,
+            for s in graph.stream(
+                {"messages": [("user", question)]},
                 config=config
                 ):
                 print(s, end=' ')
             print('\n')
 
         except RetrievalError as e:
-            logger.error(f"Retrieval error: {e}")
+            logger.error(f"Retrieval error: {e}")   
             print(f"Retrieval error: {e}")
             continue
         except ModelError as e:

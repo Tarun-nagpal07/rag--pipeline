@@ -1,9 +1,9 @@
-from src.loaders.pdf_loader import (
+from src.rag_service.pdf_loader import (
     get_pdf_paths,
     load_pdf,
 )
-from src.splitter.text_splitter import splitter
-from src.vectordb.qdrant_store import vector_store
+from src.rag_service.text_splitter import splitter
+from src.rag_service.qdrant_store import vector_store
 from src.utils.errors import DocumentLoadError
 
 for pdf_path in get_pdf_paths("./documents"):
