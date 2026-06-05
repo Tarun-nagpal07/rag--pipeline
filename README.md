@@ -32,13 +32,21 @@ Create a `.env` file in the project root and add your configuration values:
 
 ```env
 API_KEY=your_api_key
+OPENAI_API_KEY=your_openai_api_key
 BASE_URL=https://api.example.com
 HF_TOKEN=your_hf_token
 QDRANT_HOST=http://localhost:6333
-OPENAI_API_KEY=your_openai_api_key
+OPENAI_CA_BUNDLE=/path/to/company-or-root-ca.pem
+LANGFUSE_SECRET_KEY=your_langfuse_secret_key
+LANGFUSE_PUBLIC_KEY=your_langfuse_public_key
+LANGFUSE_BASE_URL=https://cloud.langfuse.com
+RAGAS_ENABLED=true
 ```
 
-Adjust values as needed for your environment.
+If you see `CERTIFICATE_VERIFY_FAILED`, set `OPENAI_CA_BUNDLE` to the PEM file for your company proxy/root CA. Keep certificate verification enabled; do not disable SSL verification for production use.
+
+RAGAS evaluation runs after a retrieved answer is generated. The app currently logs `ragas_faithfulness` and `ragas_answer_relevancy` as Langfuse scores on the active LangGraph trace.
+
 
 ## 5. Start Qdrant with Docker
 

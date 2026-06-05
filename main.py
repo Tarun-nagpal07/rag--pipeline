@@ -2,7 +2,6 @@ import logging
 # from src.rag_service.graph import chain
 from src.utils.errors import ModelError, RetrievalError
 from src.rag_service.langfuse import get_langfuse_handler
-from langfuse.decorators import observe
 from src.utils.logger import get_logger
 from src.graph.build import graph
 
@@ -19,8 +18,6 @@ config = {
     }
 }
 
-
-@observe()
 def main():
     print("..........Hello, Welcome to Health Chatbot...........")
 
@@ -39,7 +36,13 @@ def main():
                 {"messages": [("user", question)]},
                 config=config
                 ):
-                print(s, end=' ')
+                for node, update in s.items():
+                    print("Update from node", node)
+                    if update.get("messages"):
+                        update["messages"][-1].pretty_print()
+                    if update.get("ragas_scores"):
+                        print("RAGAS scores:", update["ragas_scores"])
+                    print("\n\n")
             print('\n')
 
         except RetrievalError as e:

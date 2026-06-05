@@ -1,7 +1,7 @@
 from langchain.agents import create_agent
 from src.prompts.garde_prompt import grade_template
 from pydantic import BaseModel, Field
-from langgraph.graph import MessagesState
+from src.graph.state import HealthState
 from typing import Literal
 from src.rag_service.llm import Model
 from src.utils.logger import get_logger
@@ -17,7 +17,7 @@ class GradeDocument(BaseModel):
 
 
 
-def grade_node(state:MessagesState) -> Literal['generate_answer','rewrite_question']:
+def grade_node(state:HealthState) -> Literal['generate_answer','rewrite_question']:
     """Determine whether the retrieved documents are relevant to the question."""
     question = state["messages"][0].content
     context = state["messages"][-1].content
