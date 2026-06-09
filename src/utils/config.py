@@ -17,6 +17,9 @@ LANGFUSE_BASE_URL=os.getenv("LANGFUSE_BASE_URL")
 QDRANT_HOST = os.getenv("QDRANT_HOST")
 RAGAS_ENABLED = os.getenv("RAGAS_ENABLED", "true").lower() == "true"
 
+FIRST_FALLBACK_LLM="qwen/qwen3-32b"
+GROQ_API_KEY=os.getenv("GROQ_API_KEY")
+
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 

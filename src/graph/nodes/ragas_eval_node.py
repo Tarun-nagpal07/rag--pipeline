@@ -13,9 +13,9 @@ from src.rag_service.hf_embedding import Embeddings
 from src.rag_service.langfuse import get_langfuse_client, langfuse_enabled
 from src.utils.config import RAGAS_ENABLED, LLM_MODEL, API_KEY, BASE_URL
 from src.utils.logger import get_logger
-from src.rag_service.llm import GeminiModel
+from src.rag_service.llm import GroqModel
 
-llm = GeminiModel()
+llm = GroqModel()
 logger = get_logger(__name__)
 
 

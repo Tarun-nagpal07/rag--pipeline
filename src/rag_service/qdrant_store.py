@@ -13,7 +13,8 @@ def VectorStore():
         vector_store = QdrantVectorStore(
             client=client,
             collection_name="documents",
-            embedding=Embeddings()
+            embedding=Embeddings(),
+            
         )
         return vector_store
     except Exception as e:

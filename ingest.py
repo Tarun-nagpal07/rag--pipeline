@@ -3,8 +3,11 @@ from src.rag_service.pdf_loader import (
     load_pdf,
 )
 from src.rag_service.text_splitter import splitter
-from src.rag_service.qdrant_store import vector_store
+from src.rag_service.qdrant_store import VectorStore
 from src.utils.errors import DocumentLoadError
+
+
+vector_store = VectorStore()
 
 for pdf_path in get_pdf_paths("./documents"):
 

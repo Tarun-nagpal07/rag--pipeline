@@ -13,8 +13,8 @@ workflow = StateGraph(HealthState)
 
 workflow.add_node(agent_retriever_node)
 workflow.add_node("retrieve", ToolNode([retrieve_from_doc]))
-workflow.add_node(grade_node)
-workflow.add_node(rewrite_question)
+# workflow.add_node(grade_node)
+# workflow.add_node(rewrite_question)
 workflow.add_node(generate_answer)
 workflow.add_node(ragas_eval_node)
 
@@ -41,13 +41,15 @@ workflow.add_conditional_edges(
     },
 )
 
-workflow.add_conditional_edges(
-    "retrieve",
-    grade_node,
-)
+# workflow.add_conditional_edges(
+#     "retrieve",
+#     grade_node,
+# )
+
+workflow.add_edge("retrieve","generate_answer")
 workflow.add_edge("generate_answer", "ragas_eval_node")
 workflow.add_edge("ragas_eval_node", END)
-workflow.add_edge("rewrite_question", "agent_retriever_node")
+# workflow.add_edge("rewrite_question", "agent_retriever_node")
 
 # Compile
 graph = workflow.compile()

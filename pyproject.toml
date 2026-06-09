@@ -3,17 +3,18 @@ name = "rag-work"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "dotenv>=0.9.9",
     "langchain>=1.3.2",
     "langchain-community==0.4.0",
     "langchain-huggingface>=1.2.2",
     "langchain-openai>=1.2.2",
-    "langchain-text-splitter",
     "langgraph>=1.2.2",
     "langfuse>=2.60.10,<3",
     "ragas>=0.4.3",
     "sentence-transformers>=5.5.1",
     "pypdf>=3.19.0",
+    "langchain-text-splitters",
+    "langchain-core>=1.4.2",
 ]
