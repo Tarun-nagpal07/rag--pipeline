@@ -1,7 +1,7 @@
 from langgraph.graph import END, START, StateGraph
 from langgraph.prebuilt import ToolNode
 from src.graph.nodes.agent_grade import grade_node
-from src.graph.nodes.agent_retriever import agent_retriever_node
+from graph.nodes.intent_classifier import agent_retriever_node
 from src.tools.retriver_tool import retrieve_from_doc
 from src.graph.nodes.rewrite_node import rewrite_question
 from src.graph.nodes.generate_final_node import generate_answer

@@ -1,4 +1,4 @@
-from src.prompts.rag_prompts import prompt as rag_prompt
+from prompts.generate_final import prompt as rag_prompt
 from src.rag_service.llm import Model
 from src.utils.logger import get_logger
 from src.graph.state import HealthState

@@ -1,6 +1,6 @@
 
 from src.rag_service.retriever import Retriever
-from src.prompts.rag_prompts import prompt
+from prompts.generate_final import prompt
 from src.rag_service.llm import Model
 from langchain_core.runnables import RunnableLambda,RunnableParallel, RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser

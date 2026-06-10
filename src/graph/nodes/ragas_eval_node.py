@@ -2,21 +2,44 @@ import math
 from typing import Any
 
 from langchain_core.runnables import RunnableConfig
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from ragas import EvaluationDataset, evaluate
+from ragas.llms import LangchainLLMWrapper
 from ragas.embeddings import LangchainEmbeddingsWrapper
-# from ragas.llms import llm_factory
-from ragas.metrics.collections.answer_relevancy import AnswerRelevancy
-from ragas.metrics.collections.faithfulness import Faithfulness
+from ragas.metrics import AnswerRelevancy, ContextRelevance, Faithfulness
 
 from src.graph.state import HealthState
-from src.rag_service.hf_embedding import Embeddings
 from src.rag_service.langfuse import get_langfuse_client, langfuse_enabled
-from src.utils.config import RAGAS_ENABLED, LLM_MODEL, API_KEY, BASE_URL
+from src.utils.config import API_KEY, BASE_URL, RAGAS_ENABLED
 from src.utils.logger import get_logger
-from src.rag_service.llm import GroqModel
 
-llm = GroqModel()
 logger = get_logger(__name__)
+
+_langchain_llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    api_key=API_KEY,
+    base_url=BASE_URL,
+)
+ragas_llm = LangchainLLMWrapper(_langchain_llm)
+
+_langchain_embeddings = OpenAIEmbeddings(
+    model="text-embedding-3-small",
+    api_key=API_KEY,
+    base_url=BASE_URL,
+)
+ragas_embeddings = LangchainEmbeddingsWrapper(_langchain_embeddings)
+
+_faithfulness = Faithfulness()
+_faithfulness.llm = ragas_llm
+
+_context_relevance = ContextRelevance()
+_context_relevance.llm = ragas_llm
+
+_answer_relevancy = AnswerRelevancy()
+_answer_relevancy.llm = ragas_llm
+_answer_relevancy.embeddings = ragas_embeddings
+
+METRICS = [_faithfulness, _context_relevance, _answer_relevancy]
 
 
 def _trace_id_from_config(config: RunnableConfig | None) -> str | None:
@@ -31,14 +54,14 @@ def _trace_id_from_config(config: RunnableConfig | None) -> str | None:
 
 
 def _clean_scores(scores: dict[str, Any]) -> dict[str, float]:
-    clean_scores = {}
-    for name, value in scores.items():
-        if isinstance(value, (int, float)) and not math.isnan(float(value)):
-            clean_scores[name] = float(value)
-    return clean_scores
+    return {
+        name: float(value)
+        for name, value in scores.items()
+        if isinstance(value, (int, float)) and not math.isnan(float(value))
+    }
 
 
-def _score_in_langfuse(scores: dict[str, float], trace_id: str | None):
+def _score_in_langfuse(scores: dict[str, float], trace_id: str | None) -> None:
     if not scores or not trace_id or not langfuse_enabled():
         return
 
@@ -54,15 +77,26 @@ def _score_in_langfuse(scores: dict[str, float], trace_id: str | None):
     langfuse.flush()
 
 
-def ragas_eval_node(state: HealthState, config: RunnableConfig | None = None):
-    """Evaluate the generated RAG answer with RAGAS and send scores to Langfuse."""
+def ragas_eval_node(
+    state: HealthState,
+    config: RunnableConfig | None = None,
+) -> dict[str, Any]:
+    """
+    LangGraph node — evaluates the RAG answer with RAGAS and sends scores to
+    Langfuse.  Returns ``{"ragas_scores": {...}}`` so the scores land in state.
+
+    Reference-free metrics used (no ground-truth required):
+      • Faithfulness      — answer is grounded in the retrieved context
+      • ContextRelevance  — retrieved context is relevant to the question
+      • AnswerRelevancy   — answer actually addresses the question
+    """
     if not RAGAS_ENABLED:
         return {}
 
     try:
-        question = state["messages"][0].content
-        answer = state["messages"][-1].content
-        context = state.get("context") or ""
+        question: str = state["messages"][0].content
+        answer: str = state["messages"][-1].content
+        context: str = state.get("context") or ""
 
         dataset = EvaluationDataset.from_list(
             [
@@ -76,16 +110,16 @@ def ragas_eval_node(state: HealthState, config: RunnableConfig | None = None):
 
         result = evaluate(
             dataset=dataset,
-            metrics=[Faithfulness(llm=llm), AnswerRelevancy(llm=llm)],
-            llm=llm,
-            embeddings=LangchainEmbeddingsWrapper(Embeddings()),
+            metrics=METRICS,
             raise_exceptions=False,
             show_progress=False,
         )
+
         scores = _clean_scores(result.scores[0])
         _score_in_langfuse(scores, _trace_id_from_config(config))
-        logger.info(f"RAGAS scores: {scores}")
+        logger.info("RAGAS scores: %s", scores)
         return {"ragas_scores": scores}
+
     except Exception as exc:
-        logger.exception(f"RAGAS evaluation failed: {exc}")
+        logger.exception("RAGAS evaluation failed: %s", exc)
         return {"ragas_scores": {}}

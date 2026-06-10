@@ -19,6 +19,3 @@ def retrieve_from_doc(question: str) -> str:
     docs = retriver.invoke(question)
     logger.info("Tool call complete")
     return format_docs(docs)
-
-
-
