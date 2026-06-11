@@ -1,5 +1,5 @@
 from langfuse import Langfuse
-from langfuse.langchain import CallbackHandler
+from langfuse.callback import CallbackHandler
 
 from src.utils.config import (
     LANGFUSE_BASE_URL,

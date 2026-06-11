@@ -17,4 +17,8 @@ dependencies = [
     "pypdf>=3.19.0",
     "langchain-text-splitters",
     "langchain-core>=1.4.2",
+    "langfuse-langchain>=2.60.10.1",
+    "langchain-openapi>=0.1.1",
+    "qdrant-client>=1.18.0",
+    "langchain-qdrant>=1.1.0",
 ]

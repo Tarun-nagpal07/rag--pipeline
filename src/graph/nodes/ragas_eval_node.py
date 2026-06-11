@@ -96,14 +96,18 @@ def ragas_eval_node(
     try:
         question: str = state["messages"][0].content
         answer: str = state["messages"][-1].content
-        context: str = state.get("context") or ""
+        contexts  = state.get("context",[])
 
+        retrieved_contexts = [
+            chunk["content"]
+            for chunk in contexts
+        ]
         dataset = EvaluationDataset.from_list(
             [
                 {
                     "user_input": question,
                     "response": answer,
-                    "retrieved_contexts": [context],
+                    "retrieved_contexts": retrieved_contexts,
                 }
             ]
         )

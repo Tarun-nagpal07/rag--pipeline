@@ -15,4 +15,5 @@ def rewrite_question(state:MessagesState):
 
     logger.info("Retriving some content needed as per user question..")
     response = model.invoke([{"role":"user", "content": prompt}])
-    return {"messages" : [response]}
+    retry_count = state.get("retry_count", 0) + 1
+    return {"messages" : [response],"retry_count": retry_count}

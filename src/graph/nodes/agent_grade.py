@@ -1,38 +1,37 @@
-from langchain.agents import create_agent
-from src.prompts.garde_prompt import grade_template
-from pydantic import BaseModel, Field
-from src.graph.state import HealthState
 from typing import Literal
-from src.rag_service.llm import Model
+from src.graph.state import HealthState
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-class GradeDocument(BaseModel):
-    """Grade documents using a binary score for relevance check."""
-
-    binary_score: str = Field(
-        description="Relevance score: 'yes' if relevant, or 'no' if not relevant"
-    )
+THRESHOLD = 0.60
 
 
-
-def grade_node(state:HealthState) -> Literal['generate_answer','rewrite_question']:
-    """Determine whether the retrieved documents are relevant to the question."""
-    question = state["messages"][0].content
-    context = state["messages"][-1].content
-    prompt = grade_template.format(question=question, context=context)
-    model = Model()
-    response = (
-        model
-        .with_structured_output(GradeDocument).invoke([{"role":"user", "content" : prompt}])
-    )
-    score = response.binary_score
+def grade_node(
+    state: HealthState
+) -> Literal["generate_answer", "rewrite_question"]:
     
-    logger.info(f"{score} , its generating answer")
-    if score == "yes":
+    if state.get("retry_count", 0) >= 2:
         return "generate_answer"
-    else:
+
+    chunks = state["context"]
+
+    if not chunks:
+        logger.warning("No chunks retrieved")
         return "rewrite_question"
-    
-    
+
+    scores = [
+        chunk["score"]
+        for chunk in chunks
+        if chunk.get("score") is not None
+    ]
+    avg_score = sum(scores) / len(scores)
+
+    logger.info(
+        f"Average retrieval score: {avg_score:.3f}")
+
+    if avg_score >= THRESHOLD:
+        return "generate_answer"
+
+    logger.info("One or more chunks below threshold")
+    return "rewrite_question"

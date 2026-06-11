@@ -1,5 +1,4 @@
 from src.rag_service.llm import Model
-from src.tools.retriver_tool import retrieve_from_doc
 from src.utils.logger import get_logger
 from src.graph.state import HealthState
 from pydantic import BaseModel
@@ -15,7 +14,7 @@ def Intent_classifier_node(state:HealthState):
     the question, it will decide question is related to Health and require information from documents, or simply respond to the user.
     """
     model = Model()
-    prompt = classifier_prompt.format(state["messages"])
+    prompt = classifier_prompt.format(question=state["messages"][0].content)
     response = (
         model
         .with_structured_output(Classifier).invoke(prompt)
