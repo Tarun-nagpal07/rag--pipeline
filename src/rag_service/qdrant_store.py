@@ -1,22 +1,24 @@
-from qdrant_client import QdrantClient
-from langchain_qdrant import QdrantVectorStore
-from src.rag_service.hf_embedding import Embeddings
-from src.utils.config import QDRANT_HOST
-from src.utils.errors import VectorStoreError
-
-client = QdrantClient(
-    url=QDRANT_HOST
-)
-
-def VectorStore():
-    try:
-        vector_store = QdrantVectorStore(
-            client=client,
-            collection_name="documents",
-            embedding=Embeddings(),
-            
+import os
+from functools import lru_cache
+from qdrant_client import AsyncQdrantClient, models
+from qdrant_client.models import VectorParams, Distance, PayloadSchemaType
+from src.utils.config import QDRANT_API,QDRANT_URL
+ 
+@lru_cache(maxsize=1)
+def get_qdrant_client() -> AsyncQdrantClient:
+    """Return a singleton AsyncQdrantClient."""
+    qdrant_url = os.environ.get("QDRANT_URL", "http://localhost:6333")
+    qdrant_api_key = os.environ.get("QDRANT_API_KEY", None)
+    return AsyncQdrantClient(url=qdrant_url, api_key=qdrant_api_key, timeout=30)
+ 
+ 
+async def ensure_faq_collection():
+    """Ensure the FAQ knowledge collection exists."""
+    client = get_qdrant_client()
+    collection_name = "documents"
+    if not await client.collection_exists(collection_name):
+        await client.create_collection(
+            collection_name=collection_name,
+            vectors_config=VectorParams(size=768, distance=Distance.COSINE),
         )
-        return vector_store
-    except Exception as e:
-        raise VectorStoreError(str(e))
-
+ 
