@@ -1,53 +1,27 @@
-# from src.rag_service.retriever import Retriever
-from langchain.tools import tool
 from src.utils.logger import get_logger
-from src.rag_service.qdrant_store import VectorStore
-from src.utils.config import TOP_K
-
+from src.rag_service.retriever import VectorStore
 logger = get_logger(__name__)
 
+async def retrieve_from_doc(question: str) -> list[dict]:
+    """
+    Search and return relevant health-related information from Qdrant.
 
-def format_docs(retrieve_docs):
-    formatted_chunks = []
-
-    for doc in retrieve_docs:
-        formatted_chunks.append(
+    Returns:
+        [
             {
-                "content": doc.page_content,
-                "score": doc.metadata.get("score"),
+                "content": "...",
+                "source_file": "...",
+                "score": 0.82,
             }
-        )
-
-    return formatted_chunks
-
-
-# @tool("retrieval_tool")
-def retrieve_from_doc(question: str) -> str:
+        ]
     """
-    Search and return usefull information from Qdrant vector database similar to user question,
-    Question has to be realted on health.
-    Args:
-        question : query which is asked by user.
-    """
-    # retriver = Retriever()
     vector_store = VectorStore()
 
-    # docs = retriver.invoke(question)
-    logger.info("Tool call complete")
+    results = await vector_store.vector_search(question)
 
-    results = vector_store.similarity_search_with_score(
-        query=question,
-        k=TOP_K
+    logger.info(
+        "Retrieved %s chunks from Qdrant",
+        len(results)
     )
 
-    docs = []
-
-    for doc, score in results:
-        doc.metadata["score"] = score
-        docs.append(doc)
-
-    logger.info(f'Extracted documents : {docs}')
-
-
-
-    return format_docs(docs)
+    return results

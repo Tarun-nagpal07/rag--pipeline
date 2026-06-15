@@ -30,7 +30,7 @@ async def on_message(message: cl.Message):
 
     try:
 
-        result = graph.invoke(
+        result = await graph.ainvoke(
             {
                 "messages": [
                     (

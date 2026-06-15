@@ -5,14 +5,14 @@ from src.graph.state import HealthState
 
 logger = get_logger(__name__)
 
-def generate_answer(state: HealthState):
+async def generate_answer(state: HealthState):
     """Generate an answer."""
-    question = state["messages"][0].content
+    question = state["messages"][-1].content
     context = state["context"]
     prompt = rag_prompt.format(question=question, context=context)
     model = Model()
     logger.info("Final answer generating...")
-    response = model.invoke([{"role": "user", "content": prompt}])
+    response = await model.ainvoke([{"role": "user", "content": prompt}])
     return {
         "messages": [response]
     }

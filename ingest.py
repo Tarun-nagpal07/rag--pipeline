@@ -1,29 +1,57 @@
+import asyncio
+
 from src.rag_service.pdf_loader import (
     get_pdf_paths,
     load_pdf,
 )
 from src.rag_service.text_splitter import splitter
-from src.rag_service.qdrant_store import VectorStore
+from src.rag_service.retriever import VectorStore
 from src.utils.errors import DocumentLoadError
 
 
-vector_store = VectorStore()
+async def ingest_documents():
 
-for pdf_path in get_pdf_paths("./documents"):
+    vector_store = VectorStore()
 
-  try:
-    print(f"Processing {pdf_path.name}")
+    await vector_store.initialize()
 
-    docs = load_pdf(pdf_path)
+    for pdf_path in get_pdf_paths("./documents"):
 
-    chunks = splitter.split_documents(docs)
+        try:
+            print(f"Processing {pdf_path.name}")
 
-    for chunk in chunks:
-      chunk.metadata["source_file"] = pdf_path.name
+            docs = load_pdf(pdf_path)
 
-    vector_store.add_documents(chunks)
+            chunks = splitter.split_documents(docs)
 
-    print(f"Stored {len(chunks)} chunks")
-  except DocumentLoadError as e:
-     print(f"Document loader : {e}")
-     continue
+            for chunk in chunks:
+                chunk.metadata["source_file"] = pdf_path.name
+
+            await vector_store.add_documents(chunks)
+
+            print(
+                f"Stored {len(chunks)} chunks "
+                f"from {pdf_path.name}"
+            )
+
+        except DocumentLoadError as e:
+            print(
+                f"Document load error "
+                f"({pdf_path.name}): {e}"
+            )
+            continue
+
+        except Exception as e:
+            print(
+                f"Failed processing "
+                f"{pdf_path.name}: {e}"
+            )
+            continue
+
+    print("Ingestion completed")
+
+
+if __name__ == "__main__":
+    asyncio.run(
+        ingest_documents()
+    )

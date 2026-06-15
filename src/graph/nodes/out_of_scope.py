@@ -6,13 +6,13 @@ from pydantic import BaseModel
 from src.prompts.classifier import classifier_prompt
 logger = get_logger(__name__)
 
-def no_related_node(state: HealthState):
+async def no_related_node(state: HealthState):
     """
     Handle questions that do not require retrieval.
     """
     model = Model()
 
-    response = model.invoke(state["messages"])
+    response = await model.invoke(state["messages"])
 
     logger.info("Unrelated question handled")
 

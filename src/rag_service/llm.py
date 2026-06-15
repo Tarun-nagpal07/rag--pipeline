@@ -2,6 +2,7 @@ from langchain.chat_models import init_chat_model
 from src.utils.config import API_KEY, BASE_URL, LLM_MODEL, FIRST_FALLBACK_LLM, GROQ_API_KEY
 from src.utils.errors import ModelError
 from langchain_groq import ChatGroq
+
 def Model():
     try:
         model = init_chat_model(

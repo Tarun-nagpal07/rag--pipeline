@@ -8,12 +8,12 @@ logger = get_logger(__name__)
 
 
 
-def retriever_node(state:HealthState) -> list:
+async def retriever_node(state:HealthState) -> list:
     """Retrive the document related to question."""
     question = state['messages'][-1].content
     
 
-    context = retrieve_from_doc(question)
+    context = await retrieve_from_doc(question)
 
     return {
         "context": context

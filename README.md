@@ -48,6 +48,14 @@ If you see `CERTIFICATE_VERIFY_FAILED`, set `OPENAI_CA_BUNDLE` to the PEM file f
 RAGAS evaluation runs after a retrieved answer is generated. The app currently logs `ragas_faithfulness` and `ragas_answer_relevancy` as Langfuse scores on the active LangGraph trace.
 
 
+## 5. Start with Chainlit( Cloud Qdrant)
+```bash
+chainlit run app.py
+```
+---
+OR
+---
+
 ## 5. Start Qdrant with Docker
 
 Run Qdrant locally on port `6333`:
@@ -73,6 +81,8 @@ If `main.py` does not expose an ASGI app and instead runs as a script, start it 
 ```bash
 python main.py
 ```
+
+
 
 ## Notes
 

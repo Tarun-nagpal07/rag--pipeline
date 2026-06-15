@@ -6,7 +6,7 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-def rewrite_question(state:MessagesState):
+async def rewrite_question(state:MessagesState):
     """Rewrite the original user question"""
     message = state["messages"]
     question = message[0].content
@@ -14,6 +14,6 @@ def rewrite_question(state:MessagesState):
     model = Model()
 
     logger.info("Retriving some content needed as per user question..")
-    response = model.invoke([{"role":"user", "content": prompt}])
+    response = await model.ainvoke([{"role":"user", "content": prompt}])
     retry_count = state.get("retry_count", 0) + 1
     return {"messages" : [response],"retry_count": retry_count}

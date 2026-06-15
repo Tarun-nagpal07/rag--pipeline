@@ -31,6 +31,7 @@ def route_on_tool_calls(state: HealthState):
    else:
       return 'no_related_node'
 
+workflow.add_edge("no_related_node", END)
 
 # Decide whether to retrieve
 workflow.add_conditional_edges(
